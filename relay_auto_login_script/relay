@@ -1,7 +1,7 @@
 #!/usr/bin/env /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import os, sys, re
+import os, sys
 import curses
 import locale
 import math
