@@ -1,4 +1,4 @@
-#!/usr/bin/env /Library/Frameworks/Python.framework/Versions/2.7/bin/python2
+#!/usr/bin/env /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import os, sys, re
@@ -420,7 +420,7 @@ class SSHGO:
                 self.screen.addstr(index, 0, prefix, curses.color_pair(self.COLOR_RED_HIGH))
                 self.screen.addstr(index, len(prefix), line, curses.color_pair(self.COLOR_HIGHLIGHT))
         # render scroll bar
-        for i in xrange(screen_lines):
+        for i in range(screen_lines):
             self.screen.addstr(i, screen_cols - 2, '|', curses.color_pair(self.COLOR_WBG))
 
         scroll_top = int(math.ceil((self.top_line_number + 1.0) / max(len(all_nodes), screen_lines) * screen_lines - 1))
@@ -476,7 +476,7 @@ if __name__ == '__main__':
     parser.add_option('-c', '--config', help='use specified config file instead of hosts')
     options, args = parser.parse_args(sys.argv)
     host_file = os.path.expanduser(sshHosts)
-    print 'Use host file : ' + host_file
+    print('Use host file : ' + host_file)
 
     if options.config is not None:
         host_file = options.config
