@@ -1,32 +1,29 @@
 #!/usr/bin/env /Library/Frameworks/Python.framework/Versions/2.7/bin/python2
 # -*- coding: utf-8 -*-
 
-import os, sys, re
+import os,sys,re
 import curses
 import locale
 import math
 import re
 # import logging
 from optparse import OptionParser
-
 locale.setlocale(locale.LC_ALL, '')
 
 script = sys.path[0] + "/login.sh"
 sshHosts = sys.path[0] + "/hosts"
 
 # logging.basicConfig(
-#     level=logging.DEBUG,
-#     format='%(asctime)s [%(threadName)s] (%(filename)s:%(lineno)d) %(levelname)s - %(message)s',
-#     datefmt='%Y-%m-%d %H:%M:%S',
-#     filename='myapp.log',
+#     level    = logging.DEBUG,
+#     format   = '%(asctime)s [%(threadName)s] (%(filename)s:%(lineno)d) %(levelname)s - %(message)s',
+#     datefmt  = '%Y-%m-%d %H:%M:%S',
+#     filename = 'myapp.log',
 # )
-
 
 def _assert(exp, err):
     if not exp:
-        print >> sys.stderr, err
+        print >>sys.stderr,err
         sys.exit(1)
-
 
 def _dedup(ls):
     table = {}
@@ -35,7 +32,6 @@ def _dedup(ls):
     ls_dedup = table.keys()
     ls_dedup.sort()
     return ls_dedup
-
 
 def _get_known_hosts():
     fn = os.path.expanduser(sshHosts)
@@ -61,8 +57,8 @@ def _get_known_hosts():
         fp.close()
     return _dedup(hosts)
 
-
 class SSHGO:
+
     UP = -1
     DOWN = 1
 
@@ -91,7 +87,7 @@ class SSHGO:
     screen = None
 
     def _parse_tree_from_config_file(self, config_file):
-        tree = {'line_number': None, 'expanded': True, 'line': None, 'sub_lines': []}
+        tree = {'line_number':None,'expanded':True,'line':None,'sub_lines':[]}
 
         def find_parent_line(new_node):
             line_number = new_node['line_number']
@@ -119,6 +115,7 @@ class SSHGO:
         nodes_pool = []
         line_number = 0;
 
+
         for line in open(config_file, 'r'):
             line_number += 1
             line_con = line.strip()
@@ -137,30 +134,22 @@ class SSHGO:
                         or line_level == tree_level + 1, 'invalid indent,line:' + str(line_number))
             tree_level = line_level
 
-            # 读取host文件消息 并初始化map node_infos
             node_infos = re.split(r'\s+', line_con.strip())
-            # logging.info('node_infos: %s', node_infos)
+            node_host = node_infos[0] if len(node_infos) == 4 else line_con
+            node_user = node_infos[1] if len(node_infos) == 4 else ''
+            node_pass = node_infos[2] if len(node_infos) == 4 else ''
+            node_mark = node_infos[3] if len(node_infos) == 4 else ''
 
-            line = node_infos[0] if len(node_infos) == 4 else line_con
-            node_host = node_infos[0]
-            node_port = node_infos[1]
-            node_user = node_infos[2]
-            node_pass = node_infos[3]
-            node_mark = node_infos[4]
-
-            new_node = {'level': tree_level, 'expanded': expand, 'line_number': line_number, 'line': line,
-                        'node_host': node_host, 'user': node_user, 'node_port': node_port, 'password': node_pass,
-                        'mark': node_mark,
-                        'sub_lines': []}
+            new_node = {'level':tree_level,'expanded':expand,'line_number':line_number,'line':node_host,'user':node_user,'password':node_pass,'mark':node_mark,'sub_lines':[]}
             nodes_pool.append(new_node)
             parent = find_parent_line(new_node)
             parent['sub_lines'].append(new_node)
 
         return tree, nodes_pool
 
+
     def __init__(self, config_file):
 
-        # 读取hosts文件信息
         self.hosts_tree, self.hosts_pool = self._parse_tree_from_config_file(config_file)
 
         # known_host_list = _get_known_hosts()
@@ -197,26 +186,25 @@ class SSHGO:
         curses.start_color()
         curses.use_default_colors()
 
-        # highlight
+        #highlight
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
         self.COLOR_HIGHLIGHT = 2
-        # red
+        #red
         curses.init_pair(3, curses.COLOR_RED, -1)
         self.COLOR_RED = 3
 
-        # red highlight
+        #red highlight
         curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLUE)
         self.COLOR_RED_HIGH = 4
 
-        # white bg
+        #white bg
         curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
         self.COLOR_WBG = 5
 
-        # black bg
+        #black bg
         curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_BLACK)
         self.COLOR_BBG = 6
 
-        # 开启运行
         self.run()
 
     def run(self):
@@ -233,7 +221,6 @@ class SSHGO:
             elif c == self.KEY_d:
                 for i in range(0, curses.tigetnum('lines')):
                     self.updown(1)
-            #    点击确认后进行触发登录
             elif c == self.KEY_ENTER or c == self.KEY_SPACE:
                 self.toggle_node()
             elif c == self.KEY_ESC or c == self.KEY_q:
@@ -268,22 +255,18 @@ class SSHGO:
         curses.noecho()
         curses.curs_set(0)
 
-    # 获取host文件中的每一行内容
+    # 获取host文件中的内容list
     def _get_visible_lines_for_render(self):
         lines = []
         stack = self.hosts_tree['sub_lines'] + []
         while len(stack):
             node = stack.pop()
-            # logging.debug('当前行内容node：%s', node)
-            # logging.debug('当前行内容line：%s', node['line'])
             if '<------>' not in node['line']:
-                # node['line'] = node['line'] + "<------>" + node['line']
-                split = str.split(node['line'], ' ')
-                node['line'] = split[len(split) - 1] + "<------>" + split[0]
+                node['line'] = node['mark'] + "<------>" + node['line']
             lines.append(node)
             if node['expanded'] and len(node['sub_lines']):
                 stack = stack + node['sub_lines']
-        lines.sort(key=lambda n: n['line_number'], reverse=False)
+        lines.sort(key=lambda n:n['line_number'], reverse=False)
 
         return lines
 
@@ -340,6 +323,7 @@ class SSHGO:
             if len(node['sub_lines']):
                 stack = stack + node['sub_lines']
 
+
     def open_all(self):
         for node in self.hosts_pool:
             if len(node['sub_lines']):
@@ -358,8 +342,7 @@ class SSHGO:
             node['expanded'] = not node['expanded']
         else:
             self.restore_screen()
-            # logging.info('执行前node参数：%s', node)
-            exe_args = [script, node['node_host'], node['user'], node['password'], node['node_port']]
+            exe_args = [script, node['line'].split('<------>')[1], node['user'], node['password']]
             os.execvp(script, exe_args)
 
     def render_screen(self):
@@ -373,9 +356,7 @@ class SSHGO:
         if self.highlight_line_number >= screen_lines:
             self.highlight_line_number = screen_lines - 1
 
-        # 获取所有的机器信息
         all_nodes = self.get_lines()
-        # logging.info('所有机器信息：%s', all_nodes);
         if self.top_line_number >= len(all_nodes):
             self.top_line_number = 0
 
@@ -393,8 +374,8 @@ class SSHGO:
         if self.top_line_number >= len(all_nodes):
             self.top_line_number = 0
 
-        for (index, node,) in enumerate(nodes):
-            # linenum = self.top_line_number + index
+        for (index,node,) in enumerate(nodes):
+            #linenum = self.top_line_number + index
 
             line = node['line']
             if len(node['sub_lines']):
@@ -419,20 +400,18 @@ class SSHGO:
             else:
                 self.screen.addstr(index, 0, prefix, curses.color_pair(self.COLOR_RED_HIGH))
                 self.screen.addstr(index, len(prefix), line, curses.color_pair(self.COLOR_HIGHLIGHT))
-        # render scroll bar
+        #render scroll bar
         for i in xrange(screen_lines):
             self.screen.addstr(i, screen_cols - 2, '|', curses.color_pair(self.COLOR_WBG))
 
         scroll_top = int(math.ceil((self.top_line_number + 1.0) / max(len(all_nodes), screen_lines) * screen_lines - 1))
         scroll_height = int(math.ceil((len(nodes) + 0.0) / len(all_nodes) * screen_lines))
-        highlight_pos = int(
-            math.ceil(scroll_height * ((self.highlight_line_number + 1.0) / min(screen_lines, len(nodes)))))
+        highlight_pos = int(math.ceil(scroll_height * ((self.highlight_line_number + 1.0)/min(screen_lines, len(nodes)))))
 
         self.screen.addstr(scroll_top, screen_cols - 2, '^', curses.color_pair(self.COLOR_WBG))
-        self.screen.addstr(min(screen_lines, scroll_top + scroll_height) - 1, screen_cols - 2, 'v',
-                           curses.color_pair(self.COLOR_WBG))
-        self.screen.addstr(min(screen_lines, scroll_top + highlight_pos) - 1, screen_cols - 2, '+',
-                           curses.color_pair(self.COLOR_WBG))
+        self.screen.addstr(min(screen_lines, scroll_top + scroll_height) - 1, screen_cols - 2, 'v', curses.color_pair(self.COLOR_WBG))
+        self.screen.addstr(min(screen_lines, scroll_top + highlight_pos) - 1, screen_cols - 2, '+', curses.color_pair(self.COLOR_WBG))
+
 
         self.screen.refresh()
 
@@ -447,17 +426,14 @@ class SSHGO:
         if increment < 0 and self.highlight_line_number == 0 and self.top_line_number != 0:
             self.top_line_number += self.UP
             return
-        elif increment > 0 and next_line_number == curses.tigetnum('lines') and (
-                self.top_line_number + curses.tigetnum('lines')) != visible_lines_count:
+        elif increment > 0 and next_line_number == curses.tigetnum('lines') and (self.top_line_number+curses.tigetnum('lines')) != visible_lines_count:
             self.top_line_number += self.DOWN
             return
 
         # scroll highlight line
         if increment < 0 and (self.top_line_number != 0 or self.highlight_line_number != 0):
             self.highlight_line_number = next_line_number
-        elif increment > 0 and (
-                self.top_line_number + self.highlight_line_number + 1) != visible_lines_count and self.highlight_line_number != curses.tigetnum(
-            'lines'):
+        elif increment > 0 and (self.top_line_number+self.highlight_line_number+1) != visible_lines_count and self.highlight_line_number != curses.tigetnum('lines'):
             self.highlight_line_number = next_line_number
 
     def restore_screen(self):
@@ -481,7 +457,7 @@ if __name__ == '__main__':
     if options.config is not None:
         host_file = options.config
     if not os.path.exists(host_file):
-        print >> sys.stderr, 'hosts is not found, create it'
+        print >>sys.stderr,'hosts is not found, create it'
         fp = open(host_file, 'w')
         fp.close()
 
