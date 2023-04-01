@@ -12,7 +12,7 @@ host=$1
 user=$2
 password=$3
 # relayHost="relay01.baidu.com"
-relayHost="relay.baidu-int.com"
-relayUser="wangjinlong05"
-relayPassword="zhankaishuoshuo~1"
+relayHost=""
+relayUser=""
+relayPassword=""
 ./auto_login.exp $host $user $password $relayHost $relayUser $relayPassword
