@@ -3,8 +3,8 @@ export LC_CTYPE=en_US
 cd "`dirname $0`"
 BASE_HOME=`pwd`
 
-if [ $# -ne 4 ];then
-    echo "Please check the hosts file, the format should be 'host port user password remarks'"
+if [ $# -ne 3 ];then
+    echo "请检查hosts文件，格式为host user password，如果使用门神登录，格式为host DoorGod spider/work/root"
     exit 1
 fi
 
@@ -12,6 +12,7 @@ host=$1
 user=$2
 password=$3
 # relayHost="relay01.baidu.com"
-port=$4
-
-redict $host $user $password $port
+relayHost="relay.baidu-int.com"
+relayUser="wangjinlong05"
+relayPassword="zhankaishuoshuo~1"
+./auto_login.exp $host $user $password $relayHost $relayUser $relayPassword
