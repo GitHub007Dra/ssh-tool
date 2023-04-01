@@ -10,12 +10,12 @@
 
 ## 分支介绍
 
-| 分支名称           | 功能描述                            |      |
-| :----------------- | ----------------------------------- | ---- |
-| main               | 支持使用python2连接服务器           |      |
-| tool-python3       | 支持使用python3连接服务器           |      |
-| UAuditHost-python2 | 支持使用python2自动登录跳板机服务器 |      |
-| UAuditHost-python3 | 支持使用python2自动登录跳板机服务器 |      |
+| 分支名称           | 功能描述                            |
+| :----------------- | ----------------------------------- |
+| main               | 支持使用python2连接服务器           |
+| tool-python3       | 支持使用python3连接服务器           |
+| UAuditHost-python2 | 支持使用python2自动登录跳板机服务器 |
+| UAuditHost-python3 | 支持使用python2自动登录跳板机服务器 |
 
 
 
