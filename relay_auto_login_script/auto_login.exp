@@ -12,10 +12,9 @@ trap {
 # 设置输入参数
 set host [lindex $argv 0]
 set user [lindex $argv 1]
-set password [lindex $argv 2]
-set RelayHost [lindex $argv 3]
-set RelayUser [lindex $argv 4]
-set RelayPassword [lindex $argv 5]
+set RelayHost [lindex $argv 2]
+set RelayUser [lindex $argv 3]
+set RelayPassword [lindex $argv 4]
 
 # 设置登录远程机器帐号remoteUser以及工作帐号workUser
 if { $user == "DoorGod" } {
@@ -40,17 +39,7 @@ expect {
     "*bash-baidu-ssl*" { send "ssh $remoteUser@$host\r" }
 }
 
-# 已经成功登录远程机器
-if { $user == "DoorGod" } {
-    if { $workUser != $RelayUser } {
-        # 如果使用门神免密登录，且工作帐号不是本人帐号，切换帐号并cd到用户目录
-        send "sudo su $workUser\r"
-        send "cd /home/$workUser\r"
-    }
-} else {
-    # 使用帐号+密码方式登录，自动输入密码
-    expect "*password:*" { send "$password\r" }
-}
+
 
 # 将本机编码切换到utf-8，可以解决utf-8编码的文件显示中文出现乱码问题
 # 注意：如果你需要强制转换为其他编码，请修改下行的编码或者删除
