@@ -46,6 +46,10 @@ Compression yes
 HostkeyAlgorithms +ssh-rsa
 PubkeyAcceptedKeyTypes +ssh-rsa
 ```
+配置说明：
+ControlPersist为长连接，打开之后即使关闭了所有relay的ssh连接，一段时间内也能无需密码重新连接。
+ControlMaster配合ControlPath一起使用，当打开了一个relay的ssh连接之后，再次打开无需重复输入密码，但是关闭所有连接后，再次连接relay仍需输入密码。
+Compression为压缩选项，打开之后加快数据传输速度。
 
 ### 2、配置目标服务器信息（host文件）
 
@@ -83,10 +87,11 @@ UAuditPassword=""
 如果你想要在任何地方使用这个脚本，请加入环境变量
 
 ```shell
-echo 'export PATH=$PATH:/Users/jack/relay_auto_login_script '  >> ~/.bash_profile 
+echo 'export PATH=$PATH:/Users/jack/relay_auto_login_script '  >> ~/.bash_profile
+echo 'export PATH=$PATH:/Users/jack/menshen '  >> ~/.bash_profile
 ```
 
 ### 5、使用
 
-执行relay或者menshen 命令
+执行relay或者menshen 命令，打开手机如流，进行认证后登录
 
