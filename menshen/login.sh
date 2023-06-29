@@ -22,7 +22,7 @@ fi
 
 
 
-# 跳板机 地址 账号 密码 在login.sh文件配置
+# 跳板机 地址 账号 密码 在login.sh文件配置 二期房子准备卖多少钱啊？
 relayHost=""
 relayUser=""
 relayPassword=""

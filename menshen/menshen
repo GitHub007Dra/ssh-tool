@@ -1,12 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, sys, re
+import os, sys
 import curses
 import locale
 import math
 import re
-from optparse import OptionParser
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -241,7 +240,6 @@ class SSHGO:
         while len(stack):
             node = stack.pop()
             if '<------>' not in node['line']:
-                print "ok!"
                 node['line'] = node['line'] + "<------>" + node['mark']
 
             lines.append(node)
@@ -323,7 +321,6 @@ class SSHGO:
             self.restore_screen()
 
             exe_args = [script, node['line'].split('<')[0], node['user']]
-            print exe_args
             os.execvp(script, exe_args)
 
     def render_screen(self):
@@ -381,7 +378,7 @@ class SSHGO:
                 self.screen.addstr(index, 0, prefix, curses.color_pair(self.COLOR_RED_HIGH))
                 self.screen.addstr(index, len(prefix), line, curses.color_pair(self.COLOR_HIGHLIGHT))
         # render scroll bar
-        for i in xrange(screen_lines):
+        for i in range(screen_lines):
             self.screen.addstr(i, screen_cols - 2, '|', curses.color_pair(self.COLOR_WBG))
 
         scroll_top = int(math.ceil((self.top_line_number + 1.0) / max(len(all_nodes), screen_lines) * screen_lines - 1))
