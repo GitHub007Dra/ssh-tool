@@ -10,25 +10,34 @@
 
 ## 分支介绍
 
-| 分支名称           | 功能描述                            |
-| :----------------- | ----------------------------------- |
-| main               | 支持使用python2连接服务器           |
-| tool-python3       | 支持使用python3连接服务器           |
-| UAuditHost-python2 | 支持使用python2自动登录跳板机服务器 |
-| UAuditHost-python3 | 支持使用python2自动登录跳板机服务器 |
+| 分支名称           | 功能描述                                        |
+| :----------------- | ----------------------------------------------- |
+| main               | 直连服务器（仅支持python2）                     |
+| tool-python3       | 直连服务器（仅支持python3）                     |
+| UAuditHost-python2 | 使用relay登录目标机器（仅支持python2）          |
+| UAuditHost-python3 | 使用relay登录目标机器（仅支持python3）          |
+| menshen-python2    | 使用门神登录目标机器，需要密码（仅支持python2） |
+| menshen-python3    | 使用门神登录目标机器，需要密码（仅支持python3） |
 
 
 
 ## 使用步骤
 
-确保你的机器上已经安装python 跟 expect。
+
+
+### 环境准备
+
+1、确保你的机器上已经安装python（注意python版本，拉取对应的分支） 
+
+2、安装 expect   。 mac (brew install expect) 
+
+
 
 ### 1、ssh 配置
 
 首先需要在 ~/.ssh/config的配置文件中写入以下内容
 
 ```
-
 Host *
 ControlPersist yes
 ControlMaster auto
@@ -38,17 +47,24 @@ HostkeyAlgorithms +ssh-rsa
 PubkeyAcceptedKeyTypes +ssh-rsa
 ```
 
-### 2、配置你的服务器信息
+### 2、配置目标服务器信息（host文件）
 
 你首先需要在hosts文件里面配置好你的服务器账号密码端口等信息后，然后就可以是使用relay进行登录。
 
-比如，使用空格分开
+使用空格分开
 
-```
-myserverhost 22 root xxxxxxxx test
-```
+| 分支名称           | host文件格式                 |
+| :----------------- | ---------------------------- |
+| main               | ip 22 root xxxxxxxx hostname |
+| tool-python3       | ip 22 root xxxxxxxx hostname |
+| UAuditHost-python2 | ip root password hostname    |
+| UAuditHost-python3 | ip root password hostname    |
+| menshen-python2    | ip root hostname             |
+| menshen-python3    | ip root hostname             |
 
-#### 	2.1、如果使用跳板机连接
+
+
+### 	3、跳板机配置（login.sh文件）
 
 ​	   需要配置下login.sh信息
 
@@ -62,7 +78,7 @@ UAuditPassword=""
 
 
 
-### 3、环境变量
+### 4、环境变量
 
 如果你想要在任何地方使用这个脚本，请加入环境变量
 
@@ -70,7 +86,7 @@ UAuditPassword=""
 echo 'export PATH=$PATH:/Users/jack/relay_auto_login_script '  >> ~/.bash_profile 
 ```
 
-### 4、使用
+### 5、使用
 
-执行relay 命令
+执行relay或者menshen 命令
 
