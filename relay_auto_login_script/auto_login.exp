@@ -17,6 +17,14 @@ set RelayHost [lindex $argv 3]
 set RelayUser [lindex $argv 4]
 set RelayPassword [lindex $argv 5]
 
+# 设置登录远程机器帐号remoteUser以及工作帐号workUser
+if { $user == "DoorGod" } {
+    # 门神登录使用邮箱前缀作为帐号，密码作为工作帐号
+    set remoteUser $RelayUser
+    set workUser [lindex $argv 2]
+} else {
+    set remoteUser $user
+}
 
 # 先登录relay
 catch {spawn ssh $RelayUser@$RelayHost}
